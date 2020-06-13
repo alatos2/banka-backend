@@ -1,0 +1,40 @@
+https://www.freecodecamp.org/news/a-quick-introduction-to-oauth-using-passport-js-65ea5b621a/
+
+https://medium.com/swlh/google-authentication-for-node-js-application-using-passport-678c8c068dd8
+
+
+
+// Middleware to check if the user is authenticated
+const isUserAuthenticated = (req, res, next) => {
+  if (req.user) {
+    next();
+  } else {
+    res.send('You must login!');
+  }
+};
+
+// Routes
+app.get('/', (req, res) => {
+  res.render('../index.ejs');
+});
+
+// passport.authenticate middleware is used here to authenticate the request
+app.get('/auth/google', passport.authenticate('google', {
+  scope: ['profile'] // Used to specify the required data
+}));
+
+// The middleware receives the data from Google and runs the function on Strategy config
+app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
+  res.redirect('/secret');
+});
+
+// Secret route
+app.get('/secret', isUserAuthenticated, (req, res) => {
+  res.send('You have reached the secret route');
+});
+
+// Logout route
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+});
